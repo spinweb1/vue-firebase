@@ -8,16 +8,17 @@
             </div>
             <div v-for="(ingredient, index) in smoothie.ingredients" :key="index" class="field">
                 <label for="ingredient">Edit/Remove Ingredient:</label>
-                <input type="text" name="ingredient" v-model="smoothie.ingredients[index]">
+                <input type="text" name="ingredient" v-model="ingredient.name">
                 <i class="material-icons delete" @click="RemoveIngredient(ingredient)">delete</i>
             </div>
             <div class="add-ingredient field">
-                 <label for="add-ingredient">Add Ingredient: (press enter to save)</label>
-                 <input type="text" name="add-ingredient" @keydown.enter.prevent="AddIngredient" v-model="another">
+                 <label for="add-ingredient">Add Ingredients: (press enter to save)</label><br>
+                 <input type="text" name="add-ingredient" placeholder="ingredient" class="ingredient" ref="ingredientOne" @keydown.enter.prevent="AddIngredient" v-model="another.name">
+                 <input type="text" name="add-ingredient" placeholder="amount" class="ingredient input" style="" @keydown.enter.prevent="AddIngredient(); setFocus();" v-model="another.amount">
             </div>
             <div class="field center-align">
                  <p v-if="feedback" class="red-text">{{ feedback }}</p>
-                 <button class="btn green lighten-1">Update Smoothie</button>
+                 <button class="btn green lighten-1" @click="setFocus()">Update Smoothie</button>
                  <router-link :to="{ name: 'Index' }">
                     <i class="close material-icons">close</i>
                  </router-link>
@@ -35,16 +36,16 @@ export default {
     data() {
         return {
             smoothie: '',
-            another: null,
+            another: {name: '', amount: ''},
             feedback: null
         }
     },
     methods: {
         AddIngredient() {
-            if (this.another) {
-                this.smoothie.ingredients.push(this.another);
-                console.log(this.smoothie.ingredients)
-                this.another = null
+            if (this.another.name && this.another.amount) {
+                this.smoothie.ingredients.push({name: this.another.name, amount: this.another.amount});
+                //console.log(this.smoothie.ingredients)
+                this.another = {name: '', amount: ''}
                 this.feedback = null
             } else {
                 this.feedback = 'You must type something to add an ingredient'
@@ -81,6 +82,19 @@ export default {
             } else {
                 this.feedback = "You must enter a smoothie title"
             }
+        },
+        setFocus: function() {
+            // Note, you need to add a ref="ingredientOne" attribute to your input.
+            this.$refs.ingredientOne.focus();
+        },
+        toggleBodyClass(addRemoveClass, color) {
+            const el = document.body;
+
+            if (addRemoveClass === 'addClass') {
+                el.classList.add('white');
+            } else {
+                el.classList.remove('grey');
+            }
         }
     },
     created() {
@@ -91,18 +105,22 @@ export default {
                 this.smoothie.id = doc.id
             })
         })
+        this.toggleBodyClass('removeClass', 'grey');
+    },
+    mounted() {
+        this.toggleBodyClass('addClass', 'white');
     }
 }
 </script>
 
 <style>
 .edit-smoothie {
-    margin-top: 60px;
+    margin-top: 10px;
     padding: 20px;
     max-width: 500px;
 }  
 .edit-smoothie h2 {
-    font-size: 2em;
+    font-size: 1.8em;
     margin: 20px auto;
 } 
 .edit-smoothie .field {
@@ -118,10 +136,50 @@ export default {
     font-size: 1.4em;
 }
 .edit-smoothie .close {
-    color: #D8DF7A;
+    color: #999;
     position: relative;
     bottom: 6px;
     left: 6px;
     font-size: 1.2em;
 }  
+.edit-smoothie .close:hover {
+    color: rgb(241, 31, 31);
+}
+.edit-smoothie .delete:hover {
+    color: rgb(241, 31, 31);
+}
+.edit-smoothie .input {
+    margin-left: 40px !important;
+}
+.ingredient {
+    display: inline;
+    width: 45% !important;
+}
+::placeholder {
+    color: #ffcc80;
+    opacity: 1; /* Firefox */
+}
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: rgb(93, 92, 99);
+}
+::-ms-input-placeholder { /* Microsoft Edge */
+    color: rgb(93, 92, 99);
+}
+.white {
+    background-color: #fff;
+}
+.grey {
+    background-color: #9e9e9e;
+}
+@media only screen and (max-width: 468px) {
+    .ingredient {
+        width: 43% !important;
+    }
+    .edit-smoothie .input {
+        margin-left: 30px !important;
+    }
+    .edit-smoothie h2 {
+        font-size: 1.5em;
+    }
+}
 </style>

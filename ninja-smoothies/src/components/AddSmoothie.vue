@@ -8,16 +8,17 @@
             </div>
             <div v-for="(ingredient, index) in ingredients" :key="index" class="field">
                 <label for="ingredient">Ingredient:</label>
-                <input type="text" name="ingredient" v-model="ingredients[index]">
-                <i class="material-icons delete" @click="RemoveIngredient(ingredient)">delete</i>
+                <input type="text" name="ingredient" v-model="ingredient.name">
+                <i class="material-icons delete" @click="RemoveIngredient(ingredient); toggleBodyClass('removeClass', 'grey');">delete</i>
             </div>
             <div class="add-ingredient title">
-                 <label for="add-ingredient">Add Ingredient: (press enter to save)</label>
+                 <label for="add-ingredient">Add Ingredients: (press enter to save)</label><br>
                  <p v-show="feedback" class="red-text" v-bind="feedback">{{ feedback }}</p>
-                 <input type="text" name="add-ingredient" @keydown.enter.prevent="AddIngredient" v-model="another">
+                 <input type="text" name="add-ingredient" placeholder="ingredient" ref="ingredientOne" class="ingredient" @keydown.enter.prevent="AddIngredient" v-model="another.name">
+                 <input type="text" name="add-ingredient" placeholder="amount" class="ingredient" style="margin-left: 40px;" @keydown.enter.prevent="AddIngredient(); setFocus();" v-model="another.amount">
             </div>
             <div class="field center-align">
-                 <button class="btn green lighten-1">Add Smoothie</button>
+                 <button class="btn green lighten-1" @click="setFocus()">Add Smoothie</button>
                  <router-link :to="{ name: 'Index' }">
                     <i class="close material-icons">close</i>
                  </router-link>
@@ -35,7 +36,7 @@ export default {
     data() {
         return {
             title: null,
-            another: null,
+            another: {name: '', amount: ''},
             ingredients: [],
             feedback: null,
             slug: null,
@@ -68,13 +69,12 @@ export default {
             } else {
                 this.feedback = "You must enter a smoothie title"
             }
-
         },
         AddIngredient() {
-            if (this.another) {
-                this.ingredients.push(this.another);
+            if (this.another.name && this.another.amount) {
+                this.ingredients.push({name: this.another.name, amount: this.another.amount});
                 console.log(this.ingredients)
-                this.another = null
+                this.another = {name: '', amount: ''}
                 this.feedback = null
             } else {
                 this.feedback = "Please type something"
@@ -85,19 +85,44 @@ export default {
             this.ingredients = this.ingredients.filter(ingredient => {
                 return ingredient !== id
             }) 
+        },
+        setFocus: function() {
+            // Note, you need to add a ref="ingredientOne" attribute to your input.
+            this.$refs.ingredientOne.focus();
+        },
+        toggleBodyClass(addRemoveClass, color) {
+            const el = document.body;
+
+            if (addRemoveClass === 'addClass') {
+                el.classList.add('white');
+            } else {
+                el.classList.remove('grey');
+            }
         }
+    },
+    created() {
+        this.toggleBodyClass('removeClass', 'grey');
+    },
+    mounted() {
+        this.toggleBodyClass('addClass', 'white');
     }
 }
 </script>
 
 <style>
+.white {
+    background-color: #fff;
+}
+.grey {
+    background-color: #9e9e9e;
+}
 .add-smoothie {
-    margin-top: 60px;
+    margin-top: 10px;
     padding: 20px;
     max-width: 500px;
 }  
 .add-smoothie h2 {
-    font-size: 2em;
+    font-size: 1.8em;
     margin: 20px auto;
 } 
 .add-smoothie .field {
@@ -113,10 +138,41 @@ export default {
     font-size: 1.4em;
 }
 .add-smoothie .close {
-    color: #D8DF7A;
+    color: #999;
     position: relative;
     bottom: 6px;
     left: 6px;
     font-size: 1.2em;
+}
+.add-smoothie .close:hover {
+    color: rgb(241, 31, 31);
+}
+.add-smoothie .delete:hover {
+    color: rgb(241, 31, 31);
+}
+.ingredient {
+    display: inline;
+    width: 45% !important;
+}
+::placeholder {
+    color: #ffcc80;
+    opacity: 1; /* Firefox */
+}
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: rgb(93, 92, 99);
+}
+::-ms-input-placeholder { /* Microsoft Edge */
+    color: rgb(93, 92, 99);
+}
+@media only screen and (max-width: 468px) {
+    .ingredient {
+        width: 41% !important;
+    }
+    .add-smoothie .input {
+        margin-left: 30px !important;
+    }
+    .add-smoothie h2 {
+        font-size: 1.4em;
+    }
 }
 </style>

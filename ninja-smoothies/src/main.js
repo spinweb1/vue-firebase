@@ -3,8 +3,10 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import VTooltip from 'v-tooltip'
 
 Vue.config.productionTip = false
+Vue.use(VTooltip)
 
 /* eslint-disable no-new */
 new Vue({

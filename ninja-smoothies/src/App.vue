@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <navbar />
+    <navbar  />
     <router-view />
   </div>
 </template>
@@ -10,6 +10,14 @@ import Navbar from '@/components/Navbar'
 
 export default {
   name: 'App',
+  data() {
+    return {
+
+    }
+  },
+  methods: {
+
+  },
   components: {
     'navbar': Navbar
   }
